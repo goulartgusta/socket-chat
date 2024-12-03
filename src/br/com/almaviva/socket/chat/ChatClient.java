@@ -35,14 +35,13 @@ public class ChatClient {
             Scanner sc = new Scanner(System.in);
             String entradaDoUsuario = "";
             while (!entradaDoUsuario.equalsIgnoreCase("sair")) {
-            	entradaDoUsuario = sc.next();
+            	entradaDoUsuario = sc.nextLine();
                 
                 if (entradaDoUsuario.equalsIgnoreCase("sair")) {
                     System.out.println("Obrigado por participar do chat, volte sempre!");  
                     break;
                 }
                 enviaMensagem.println(entradaDoUsuario);
-                enviaMensagem.flush();
             }
         } catch (IOException e) {
             System.err.println("Erro ao conectar ao servidor... " + e.getMessage());
