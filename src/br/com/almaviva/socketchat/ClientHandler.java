@@ -26,8 +26,9 @@ public class ClientHandler implements Runnable {
     public void run() {
         try {
             usuario = getUsuario();
-            System.out.println("Usuário " + usuario + " conectado.");
-            escreveMensagem.println("Bem-vindo ao chat, " + usuario + "!");
+            System.out.println("Usuário [" + usuario + "] conectado.");
+            escreveMensagem.println("Bem-vindo ao chat, [" + usuario + "]!");
+            ChatServer.broadcast("Usuário " + usuario + " entrou no chat!", this);
 
             String entradaUsuario;
             while ((entradaUsuario = enviaMensagem.readLine()) != null) {
@@ -45,11 +46,12 @@ public class ClientHandler implements Runnable {
     }
 
     private String getUsuario() throws IOException {
-        escreveMensagem.println("Digite seu nome de usuário:");
+        escreveMensagem.println("Digite seu nome:");
         return enviaMensagem.readLine();
     }
 
     public void enviarMensagem(String mensagem) {
-        escreveMensagem.println(mensagem);
+        escreveMensagem.println("[Você] " + mensagem);
+        escreveMensagem.println("Escreva sua mensagem");
     }
 }
