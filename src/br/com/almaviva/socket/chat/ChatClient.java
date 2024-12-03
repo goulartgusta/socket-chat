@@ -10,41 +10,57 @@ import java.util.Scanner;
 public class ChatClient {
     private static final String SERVER_ADDRESS = "192.168.208.73";
     private static final int SERVER_PORT = 1234;
+    private static BufferedReader recebeMensagem;
+    private static PrintWriter enviaMensagem;
+    private static Scanner sc = new Scanner(System.in);
     
 	public static void main(String[] args) {
-    	
-        try {
-            Socket socket = new Socket(SERVER_ADDRESS, SERVER_PORT);
-        	System.out.println("Conexão ao chat bem sucedida! (para sair, digite 'sair'.) \n"+ "Por favor, digite seu nome:");
-        	
+		conectarServer();
+		escolherNomeUsuario();
+        iniciarThread();
+        iniciarChat();
+    }
 
-            BufferedReader recebeMensagem = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintWriter enviaMensagem = new PrintWriter(socket.getOutputStream(), true);
-            
-            new Thread(() -> {
-                try {
-                    String respostaDoServer;
-                    while ((respostaDoServer = recebeMensagem.readLine()) != null) {
-                        System.out.println(respostaDoServer);
-                    }
-                } catch (IOException e) {
-                    System.err.println("Conexão interrompida..." + e.getMessage());
-                }
-            }).start();
-
-            Scanner sc = new Scanner(System.in);
-            String entradaDoUsuario = "";
-            while (!entradaDoUsuario.equalsIgnoreCase("sair")) {
-            	entradaDoUsuario = sc.nextLine();
-                
-                if (entradaDoUsuario.equalsIgnoreCase("sair")) {
-                    System.out.println("Obrigado por participar do chat, volte sempre!");  
-                    break;
-                }
-                enviaMensagem.println(entradaDoUsuario);
-            }
+	private static void conectarServer() {
+        try (Socket socket = new Socket(SERVER_ADDRESS, SERVER_PORT)) {
+            recebeMensagem = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            enviaMensagem = new PrintWriter(socket.getOutputStream(), true);
         } catch (IOException e) {
             System.err.println("Erro ao conectar ao servidor... " + e.getMessage());
         }
+	}
+	
+    private static void escolherNomeUsuario() {
+        System.out.print("Conexão ao chat bem-sucedida! (para sair, digite 'sair').\nPor favor, digite seu nome: ");
+        String nomeUsuario = sc.nextLine();
+        enviaMensagem.println(nomeUsuario);
     }
+
+    private static void iniciarThread() {
+        new Thread(() -> {
+            try {
+                String respostaDoServer;
+                while ((respostaDoServer = recebeMensagem.readLine()) != null) {
+                    System.out.println(respostaDoServer);
+                }
+            } catch (IOException e) {
+                System.err.println("Conexão interrompida: " + e.getMessage());
+            }
+        }).start();
+    }
+
+    private static void iniciarChat() {
+        String entradaDoUsuario = "";
+        while (!entradaDoUsuario.equalsIgnoreCase("sair")) {
+            entradaDoUsuario = sc.nextLine();
+            
+            if (entradaDoUsuario.equalsIgnoreCase("sair")) {
+                System.out.println("Saindo do chat...");
+                enviaMensagem.println("sair");
+                break;
+            }
+            enviaMensagem.println(entradaDoUsuario);
+        }
+    }
+
 }
