@@ -13,27 +13,30 @@ public class ChatClient {
     private static BufferedReader recebeMensagem;
     private static PrintWriter enviaMensagem;
     private static Scanner sc = new Scanner(System.in);
-    
-	public static void main(String[] args) {
-		conectarServer();
-		escolherNomeUsuario();
+    private static Socket socket;
+
+    public static void main(String[] args) {
+        conectarServer();
+        escolherNomeUsuario();
         iniciarThread();
         iniciarChat();
     }
 
-	private static void conectarServer() {
-        try (Socket socket = new Socket(SERVER_ADDRESS, SERVER_PORT)) {
+    private static void conectarServer() {
+        try {
+            socket = new Socket(SERVER_ADDRESS, SERVER_PORT);
             recebeMensagem = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             enviaMensagem = new PrintWriter(socket.getOutputStream(), true);
         } catch (IOException e) {
-            System.err.println("Erro ao conectar ao servidor... " + e.getMessage());
+            System.err.println("Erro ao conectar ao servidor: " + e.getMessage());
         }
-	}
-	
+    }
+
     private static void escolherNomeUsuario() {
         System.out.print("Conexão ao chat bem-sucedida! (para sair, digite 'sair').\nPor favor, digite seu nome: ");
         String nomeUsuario = sc.nextLine();
         enviaMensagem.println(nomeUsuario);
+        enviaMensagem.flush();
     }
 
     private static void iniciarThread() {
@@ -53,14 +56,28 @@ public class ChatClient {
         String entradaDoUsuario = "";
         while (!entradaDoUsuario.equalsIgnoreCase("sair")) {
             entradaDoUsuario = sc.nextLine();
-            
+
             if (entradaDoUsuario.equalsIgnoreCase("sair")) {
                 System.out.println("Saindo do chat...");
                 enviaMensagem.println("sair");
+                enviaMensagem.flush();
+                sair();
                 break;
             }
             enviaMensagem.println(entradaDoUsuario);
+            enviaMensagem.flush();
         }
     }
 
+    private static void sair() {
+        try {
+            if (sc != null) sc.close();
+            if (enviaMensagem != null) enviaMensagem.close();
+            if (recebeMensagem != null) recebeMensagem.close();
+            if (socket != null) socket.close();
+            System.out.println("Conexão encerrada com sucesso.");
+        } catch (IOException e) {
+            System.err.println("Erro ao encerrar conexões: " + e.getMessage());
+        }
+    }
 }
