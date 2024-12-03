@@ -12,6 +12,7 @@ public class ConfigPropertiesChat {
             properties.load(arquivoConfig);
         } catch (IOException e) {
             System.err.println("Erro ao carregar config.properties: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 

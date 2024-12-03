@@ -8,15 +8,15 @@ import java.net.Socket;
 
 public class ClientHandler implements Runnable {
     private Socket clientSocket;
-    private PrintWriter escreveMensagem;
-    private BufferedReader enviaMensagem;
-    private String usuario;
+    private PrintWriter enviaMensagem;
+    private BufferedReader recebeMensagem;
 
     public ClientHandler(Socket socket) {
         this.clientSocket = socket;
         try {
-            enviaMensagem = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            escreveMensagem = new PrintWriter(clientSocket.getOutputStream(), true);
+            recebeMensagem = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            enviaMensagem = new PrintWriter(clientSocket.getOutputStream(), true);
+            
         } catch (IOException e) {
         	System.err.println("Erro na configuração de conexões do cliente: " + e.getMessage());
             e.printStackTrace();
@@ -26,40 +26,31 @@ public class ClientHandler implements Runnable {
     @Override
     public void run() {
         try {
-            usuario = getUsuario();
+            String usuario = recebeMensagem.readLine();
             System.out.println("Usuário [" + usuario + "] conectado.");
-            escreveMensagem.println("Bem-vindo ao chat, [" + usuario + "]!");
+            enviaMensagem.println("Bem-vindo ao chat, [" + usuario + "]!");
+            enviaMensagem.flush();
             ChatServer.broadcast("Usuário " + usuario + " entrou no chat!", this);
 
             String entradaUsuario;
-            while ((entradaUsuario = enviaMensagem.readLine()) != null) {                
-                System.out.println("[" + usuario + "]: " + entradaUsuario);
-                ChatServer.broadcast("[" + usuario + "]: " + entradaUsuario, this);
-                if (enviaMensagem.readLine().equalsIgnoreCase("sair")) {
-                    System.out.println("Obrigado por participar do chat, volte sempre!");  
-
-                    ChatServer.removerClient(this);
+            while ((entradaUsuario = recebeMensagem.readLine()) != null) {
+                if (entradaUsuario.equalsIgnoreCase("sair")) {
+                    System.out.println("Usuário [" + usuario + "] saiu do chat.");
+                    ChatServer.broadcast("Usuário " + usuario + " saiu do chat.", this);
                     break;
                 }
+                System.out.println("[" + usuario + "]: " + entradaUsuario);
+                ChatServer.broadcast("[" + usuario + "]: " + entradaUsuario, this);
             }
-            
+            recebeMensagem.close();
             enviaMensagem.close();
-            escreveMensagem.close();
             clientSocket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public String getUsuario() throws IOException {
-        escreveMensagem.println("Digite seu nome:");
-        String nomeUsuario = enviaMensagem.readLine();
-               
-        return nomeUsuario;
-        
-    }
-
     public void enviarMensagem(String mensagem) {
-        escreveMensagem.println(mensagem);
+        enviaMensagem.println(mensagem);
     }
 }

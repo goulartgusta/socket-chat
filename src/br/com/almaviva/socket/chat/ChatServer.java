@@ -10,8 +10,7 @@ public class ChatServer {
 
     public static void main(String[] args) {
     	ConfigPropertiesChat.carregarConfigs();
-        try {
-            ServerSocket serverSocket = new ServerSocket(ConfigPropertiesChat.getPorta("server.porta"));
+        try (ServerSocket serverSocket = new ServerSocket(ConfigPropertiesChat.getPorta("server.porta"))) {
             System.out.println("Servidor Iniciado!");
 
             while (!serverSocket.isClosed()) {
@@ -29,18 +28,11 @@ public class ChatServer {
         }
     }
 
-    public static void broadcast(String mensagem, ClientHandler donoDaMensagem) {
+    public static void broadcast(String mensagem, ClientHandler remetente) {
         for (ClientHandler client : clients) {
-            if (client != donoDaMensagem) {
+            if (client != remetente) {
                 client.enviarMensagem(mensagem);
             }
         }
-    }
-    
-    public static void removerClient(ClientHandler client) throws IOException {
-    	clients.remove(client);
-        String mensagem = "Usuário " + client.getUsuario() + " saiu do chat!";
-        System.out.println(mensagem);
-        broadcast(mensagem, null);
     }
 }

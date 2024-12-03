@@ -15,35 +15,34 @@ public class ChatClient {
     	
         try {
             Socket socket = new Socket(SERVER_ADDRESS, SERVER_PORT);
-        	System.out.println("Conexão ao chat bem sucedida! para sair, digite 'sair'.");
+        	System.out.println("Conexão ao chat bem sucedida! (para sair, digite 'sair'.) \n"+ "Por favor, digite seu nome:");
+        	
 
-            BufferedReader enviaMensagem = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintWriter escreveMensagem = new PrintWriter(socket.getOutputStream(), true);
-
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        String respostaDoServer;
-                        while ((respostaDoServer = enviaMensagem.readLine()) != null) {
-                            System.out.println(respostaDoServer);
-                        }
-                    } catch (IOException e) {
-                        System.err.println("Conexão interrompida pelo servidor ou erro de rede: " + e.getMessage());
+            BufferedReader recebeMensagem = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            PrintWriter enviaMensagem = new PrintWriter(socket.getOutputStream(), true);
+            
+            new Thread(() -> {
+                try {
+                    String respostaDoServer;
+                    while ((respostaDoServer = recebeMensagem.readLine()) != null) {
+                        System.out.println(respostaDoServer);
                     }
+                } catch (IOException e) {
+                    System.err.println("Conexão interrompida..." + e.getMessage());
                 }
             }).start();
 
             Scanner sc = new Scanner(System.in);
             String entradaDoUsuario = "";
             while (!entradaDoUsuario.equalsIgnoreCase("sair")) {
-            	entradaDoUsuario = sc.nextLine();
+            	entradaDoUsuario = sc.next();
                 
                 if (entradaDoUsuario.equalsIgnoreCase("sair")) {
                     System.out.println("Obrigado por participar do chat, volte sempre!");  
                     break;
                 }
-                escreveMensagem.println(entradaDoUsuario);
+                enviaMensagem.println(entradaDoUsuario);
+                enviaMensagem.flush();
             }
         } catch (IOException e) {
             System.err.println("Erro ao conectar ao servidor... " + e.getMessage());
