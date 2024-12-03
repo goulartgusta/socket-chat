@@ -1,4 +1,4 @@
-package br.com.almaviva.socketchat;
+package br.com.almaviva.socket.chat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,6 +18,7 @@ public class ClientHandler implements Runnable {
             enviaMensagem = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             escreveMensagem = new PrintWriter(clientSocket.getOutputStream(), true);
         } catch (IOException e) {
+        	System.err.println("Erro na configuração de conexões do cliente: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -31,12 +32,17 @@ public class ClientHandler implements Runnable {
             ChatServer.broadcast("Usuário " + usuario + " entrou no chat!", this);
 
             String entradaUsuario;
-            while ((entradaUsuario = enviaMensagem.readLine()) != null) {
+            while ((entradaUsuario = enviaMensagem.readLine()) != null) {                
                 System.out.println("[" + usuario + "]: " + entradaUsuario);
                 ChatServer.broadcast("[" + usuario + "]: " + entradaUsuario, this);
-            }
+                if (enviaMensagem.readLine().equalsIgnoreCase("sair")) {
+                    System.out.println("Obrigado por participar do chat, volte sempre!");  
 
-            ChatServer.removerClient(this);
+                    ChatServer.removerClient(this);
+                    break;
+                }
+            }
+            
             enviaMensagem.close();
             escreveMensagem.close();
             clientSocket.close();
@@ -45,13 +51,15 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    private String getUsuario() throws IOException {
+    public String getUsuario() throws IOException {
         escreveMensagem.println("Digite seu nome:");
-        return enviaMensagem.readLine();
+        String nomeUsuario = enviaMensagem.readLine();
+               
+        return nomeUsuario;
+        
     }
 
     public void enviarMensagem(String mensagem) {
         escreveMensagem.println(mensagem);
-        escreveMensagem.println("Envie sua mensagem");
     }
 }

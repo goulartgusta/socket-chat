@@ -1,4 +1,4 @@
-package br.com.almaviva.socketchat;
+package br.com.almaviva.socket.chat;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -23,7 +23,9 @@ public class ChatServer {
                 new Thread(clientHandler).start();
             }
         } catch (IOException e) {
+            System.err.println("Erro na inicialização do servidor: " + e.getMessage());
             e.printStackTrace();
+
         }
     }
 
@@ -35,7 +37,10 @@ public class ChatServer {
         }
     }
     
-    public static void removerClient(ClientHandler client) {
+    public static void removerClient(ClientHandler client) throws IOException {
     	clients.remove(client);
+        String mensagem = "Usuário " + client.getUsuario() + " saiu do chat!";
+        System.out.println(mensagem);
+        broadcast(mensagem, null);
     }
 }

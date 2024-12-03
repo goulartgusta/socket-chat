@@ -1,4 +1,4 @@
-package br.com.almaviva.socketchat;
+package br.com.almaviva.socket.jokenpo;
 
 import java.io.FileInputStream;
 import java.io.IOException;
