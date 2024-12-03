@@ -17,7 +17,7 @@ public class ChatClient {
     	
         try {
             Socket socket = new Socket(SERVER_ADDRESS, SERVER_PORT);
-        	System.out.println("Conexão ao Chat bem sucedida!");
+        	System.out.println("Conexão ao Chat bem sucedida! para sair, digite 'sair'");
 
             BufferedReader enviaMensagem = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter escreveMensagem = new PrintWriter(socket.getOutputStream(), true);
