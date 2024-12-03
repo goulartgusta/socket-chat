@@ -37,7 +37,7 @@ public class ChatClient {
             String entradaDoUsuario = "";
             while (!entradaDoUsuario.equalsIgnoreCase("sair")) {
             	entradaDoUsuario = sc.nextLine();
-                escreveMensagem.println(entradaDoUsuario);
+                escreveMensagem.println("[Você]: " + entradaDoUsuario);
             }
         } catch (IOException e) {
             e.printStackTrace();
