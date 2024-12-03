@@ -17,7 +17,7 @@ public class ChatClient {
     	
         try {
             Socket socket = new Socket(SERVER_ADDRESS, SERVER_PORT);
-        	System.out.println("Conexão ao Chat bem sucedida! para sair, digite 'sair'");
+        	System.out.println("Conexão ao Chat bem sucedida! para sair, digite 'sair'.");
 
             BufferedReader enviaMensagem = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter escreveMensagem = new PrintWriter(socket.getOutputStream(), true);
@@ -37,7 +37,7 @@ public class ChatClient {
             String entradaDoUsuario = "";
             while (!entradaDoUsuario.equalsIgnoreCase("sair")) {
             	entradaDoUsuario = sc.nextLine();
-                escreveMensagem.println("[Você]: " + entradaDoUsuario);
+                escreveMensagem.println(entradaDoUsuario);
             }
         } catch (IOException e) {
             e.printStackTrace();

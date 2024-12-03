@@ -52,6 +52,6 @@ public class ClientHandler implements Runnable {
 
     public void enviarMensagem(String mensagem) {
         escreveMensagem.println(mensagem);
-        escreveMensagem.println("Escreva sua mensagem");
+        escreveMensagem.println("Envie sua mensagem");
     }
 }
